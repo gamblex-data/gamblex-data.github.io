@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Case Opening</title>
+  <style>
+    body {
+      background-color: rgb(0, 6, 21);
+      color: white;
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    .case-container-wrapper {
+      position: relative;
+      width: 80%;
+      max-width: 900px;
+      height: 100px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      background-color: rgba(54, 17, 76, 0.2);
+
+      border-radius: 10px;
+    }
+
+    .case-container {
+      width: 9200px;
+      height: 100px;
+      position: absolute;
+      display: flex;
+    }
+
+    .case-line {
+      position: absolute;
+      width: 2px;
+      height: 100%;
+      background-color: black;
+      left: 50%;
+      z-index: 10;
+    }
+
+    .case-inner-container {
+      width: 9200px;
+      height: 100px;
+      display: flex;
+
+    }
+
+    .case-box {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+
+    }
+
+    .case-box.red {
+      background-color: red;
+    }
+
+    .case-box img {
+      max-width: 100%;
+      max-height: 100%;
+
+      object-fit: contain;
+      transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+      opacity: 85%;
+    }
+
+    .case-box.highlight img {
+      transform: scale(1.25) translateY(-2px);
+      opacity: 100%;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #7b1fa2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #9c4dcc;
+    }
+
+    header {
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      box-sizing: border-box;
+      background-color: rgb(0, 6, 21, 0.8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    header h1 {
+      margin: 0;
+      color: white;
+      font-family: "Montserrat", sans-serif;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    nav a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+      text-decoration: none;
+      font-family: "Montserrat", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 12px;
+      border-radius: 5px;
+      background-color: rgba(54, 17, 76, 0.8);
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+    }
+
+    nav a:hover {
+      background-color: #7b1fa2;
+    }
+
+    .wallet {
+      display: flex;
+      align-items: center;
+      padding: 8px 15px;
+    }
+
+    .goldIco {
+      height: 15px;
+      object-fit: contain;
+    }
+
+    main {
+      padding-top: 70px;
+    }
+
+    header::after {
+      content: "";
+      display: block;
+      width: calc(100% - 50px);
+      opacity: 80%;
+      height: 1.8px;
+      background-color: #5f1c82;
+      position: absolute;
+      bottom: 0;
+      left: 25px;
+    }
+
+    .head1 {
+      font-weight: 600;
+      margin-left: 25px;
+    }
+
+    .head1 h1 {
+      margin: 0px;
+      font-size: 50px;
+    }
+
+    .head1 p {
+      margin-left: 10px;
+      opacity: 70%;
+      font-size: 16px;
+      white-space: nowrap;
+      margin-top: 0;
+    }
+
+    * {
+      -webkit-user-drag: none;
+      -khtml-user-drag: none;
+      -moz-user-drag: none;
+      -o-user-drag: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    @media (max-width: 1024px) {
+      .head1 h1 {
+        font-size: 40px;
+      }
+
+      .head1 p {
+        font-size: 16px;
+        white-space: normal;
+        width: 80%;
+      }
+    }
+
+    @media (max-width: 700px) {
+
+
+      .head1 h1 {
+        font-size: 35px;
+      }
+
+      .head1 p {
+        font-size: 13px;
+        white-space: normal;
+        width: 80%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>GAMBLE-X</h1>
+    <nav>
+      <a class="logout" href="#Logout">
+        <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+      </a>
+      <a class="wallet" href="#Wallet">
+        <span class="g-text">0</span>
+        <img class="goldIco" src="gold.webp" />
+      </a>
+    </nav>
+  </header>
+  <div class="case-container-wrapper">
+    <div class="case-line"></div>
+    <div class="case-container" id="caseContainer">
+      <div class="case-inner-container" id="caseInnerContainer"></div>
+    </div>
+  </div>
+  <button id="spinButton">Spin</button>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
+    import {
+      getDatabase,
+      ref,
+      get,
+    } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwztPRk-03SbzzXBL2oVcNhIVVyoMghRo",
+      authDomain: "x-gamble.firebaseapp.com",
+      databaseURL: "https://x-gamble-default-rtdb.firebaseio.com",
+      projectId: "x-gamble",
+      storageBucket: "x-gamble.firebasestorage.app",
+      messagingSenderId: "137859041618",
+      appId: "1:137859041618:web:b494dcc52c5175943ed28b",
+      measurementId: "G-JLWF6GZJE9",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let itemData = [];
+    const caseInnerContainer = document.getElementById("caseInnerContainer");
+
+    async function loadData() {
+      try {
+        const caseID = "00001";
+        const caseRef = ref(db, `cases/${caseID}`);
+        const caseSnapshot = await get(caseRef);
+
+        if (!caseSnapshot.exists()) {
+          console.error(`Case data not found for ID: ${caseID}`);
+          return;
+        }
+
+        const skinsString = caseSnapshot.val();
+        if (!skinsString) {
+          console.error(`Invalid or empty 'skins' string for case ${caseID}`);
+          return;
+        }
+
+        const skins = skinsString
+          .split(",")
+          .map((id) => id.trim())
+          .filter(Boolean);
+
+        console.log("Parsed skins array:", skins);
+
+        const skinPromises = skins.map(async (id) => {
+          const skinRef = ref(db, `items/all/${id}`);
+          const skinSnapshot = await get(skinRef);
+
+          if (!skinSnapshot.exists()) {
+            console.warn(`Skin not found for ID: ${id}`);
+            return null;
+          }
+
+          const skinData = skinSnapshot.val();
+
+          const rawName = skinData.data.split("_")[1];
+          const name = rawName.replace(/-/g, " ");
+
+          const img = `https://raw.githubusercontent.com/gamblex-data/gamblex/refs/heads/main/items/${skinData.collection}/${skinData.data}.png`;
+
+          return {
+            ...skinData,
+            name,
+            img,
+            rarity: parseFloat(skinData.rarity) || 100,
+          };
+        });
+
+        const fetchedSkins = await Promise.all(skinPromises);
+
+        itemData = fetchedSkins.filter(Boolean);
+
+        if (itemData.length === 0) {
+          console.error("No valid skins found after fetching data.");
+          return;
+        }
+
+        setupBoxes();
+      } catch (error) {
+        console.error("Error loading data from Realtime Database:", error);
+      }
+    }
+
+    function setupBoxes() {
+      const numBoxes = Math.floor(caseInnerContainer.offsetWidth / 102);
+      caseInnerContainer.innerHTML = Array(numBoxes)
+        .fill(`<div class="case-box"></div>`)
+        .join("");
+      document.querySelectorAll(".case-box")[numBoxes - 6].classList.add("red");
+      assignSkins();
+    }
+
+    function assignSkins() {
+      const boxes = document.querySelectorAll(".case-box");
+
+      let totalWeight = itemData.reduce((sum, item) => sum + item.rarity, 0);
+
+      boxes.forEach((box) => {
+        const rand = Math.random() * totalWeight;
+        let accumulatedWeight = 0;
+
+        for (let item of itemData) {
+          accumulatedWeight += item.rarity;
+          if (rand <= accumulatedWeight) {
+            box.innerHTML = `<img src="${item.img}" alt="${item.name}" title="${item.name}" />`;
+            break;
+          }
+        }
+      });
+    }
+
+    function alignRedBox() {
+      const caseContainerElement = document.getElementById("caseContainer");
+      const caseWrapperElement = document.querySelector(".case-container-wrapper");
+      const caseBoxes = document.querySelectorAll(".case-box");
+
+
+      const redBoxIndex = Array.from(caseBoxes).findIndex((box) =>
+        box.classList.contains("red")
+      );
+
+      if (redBoxIndex === -1) {
+        console.error("No red box found!");
+        return;
+      }
+
+      const boxWidth = caseBoxes[0].offsetWidth;
+      const containerWidth = caseWrapperElement.offsetWidth;
+
+
+      const redBoxLeft = redBoxIndex * boxWidth;
+
+
+      const randomPosition = Math.random() * boxWidth + redBoxLeft;
+
+
+      const wrapperCenter = containerWidth / 2;
+      const targetTranslation = wrapperCenter - randomPosition;
+
+
+      caseContainerElement.style.transform = `translateX(${targetTranslation}px)`;
+    }
+
+
+
+    function spin() {
+      const caseContainerElement = document.getElementById("caseContainer");
+
+
+      caseContainerElement.style.transition = "none";
+      caseContainerElement.style.transform = "translateX(0)";
+
+
+      caseContainerElement.offsetHeight;
+
+
+      caseContainerElement.style.transition = "transform 12s cubic-bezier(0.08, 0.6, 0.2, 1)";
+
+
+      alignRedBox();
+      setTimeout(() => {
+        caseContainerElement.style.transition = "none";
+      }, 12000);
+    }
+
+
+    window.addEventListener("resize", () => {
+      alignRedBox();
+    });
+
+
+    window.onload = () => {
+      loadData();
+      setInterval(highlightBoxes, 111);
+    };
+
+
+
+    function highlightBoxes() {
+      const lineLeft = document.querySelector(".case-line").getBoundingClientRect().left;
+      const boxes = document.querySelectorAll(".case-box");
+
+      boxes.forEach((box) => {
+        const boxRect = box.getBoundingClientRect();
+        const isOverlapping =
+          boxRect.left < lineLeft && boxRect.right > lineLeft;
+        box.classList.toggle("highlight", isOverlapping);
+      });
+    }
+
+    window.spin = spin;
+
+    window.onload = () => {
+      loadData();
+      setInterval(highlightBoxes, 111);
+    };
+
+    document.getElementById("spinButton").addEventListener("click", spin);
+  </script>
+</body>
+
+</html>
