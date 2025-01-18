@@ -382,8 +382,8 @@
 
         async function fetchCases() {
   try {
-    const itemsResponse = await fetch("./items.json");
-    const mainResponse = await fetch("./main.json");
+    const itemsResponse = await fetch("https://raw.githubusercontent.com/gamblex-data/gamblex/refs/heads/main/items.json");
+    const mainResponse = await fetch("https://raw.githubusercontent.com/gamblex-data/gamblex/refs/heads/main/main.json");
     const itemsData = await itemsResponse.json();
     const mainData = await mainResponse.json();
 
