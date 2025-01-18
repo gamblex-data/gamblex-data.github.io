@@ -279,12 +279,12 @@
   
       try {
         const caseID = new URLSearchParams(window.location.search).get('open');
-        if (!caseID) return window.location.href = "/";
+        if (!caseID) return console.log("no caseid");
   
         const casesData = await fetch('https://raw.githubusercontent.com/gamblex-data/gamblex/refs/heads/main/cases.json').then(response => response.json());
         const itemsData = await fetch('https://raw.githubusercontent.com/gamblex-data/gamblex/refs/heads/main/items.json').then(response => response.json());
         const skinsString = casesData[caseID];
-        if (!skinsString) return window.location.href = "/";
+        if (!skinsString) return console.log("no skinstring");
   
         const skins = skinsString.split(",").map(id => id.trim()).filter(Boolean);
   
@@ -306,7 +306,7 @@
   
         itemData = (await Promise.all(skinPromises)).filter(Boolean);
   
-        if (itemData.length === 0) return window.location.href = "/";
+        if (itemData.length === 0) return console.log("no itemdata");
   
         setupBoxes();
         spinButton.disabled = false;
