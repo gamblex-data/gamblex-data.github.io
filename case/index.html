@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Case Opening</title>
+  <link
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  rel="stylesheet"
+/>
   <style>
     body {
       background-color: rgb(0, 6, 21);
@@ -17,6 +20,7 @@
       align-items: center;
       height: 100vh;
       flex-direction: column;
+      visibility: hidden; 
     }
 
     .case-container-wrapper {
@@ -27,7 +31,6 @@
       overflow: hidden;
       margin-bottom: 20px;
       background-color: rgba(54, 17, 76, 0.2);
-
       border-radius: 10px;
     }
 
@@ -42,7 +45,7 @@
       position: absolute;
       width: 2px;
       height: 100%;
-      background-color: black;
+      background-color: #5f1c82;
       left: 50%;
       z-index: 10;
     }
@@ -51,7 +54,6 @@
       width: 9200px;
       height: 100px;
       display: flex;
-
     }
 
     .case-box {
@@ -61,24 +63,22 @@
       align-items: center;
       justify-content: center;
       transition: transform 0.3s ease;
-
     }
 
     .case-box.red {
-      background-color: red;
+      background-color: transparent;
     }
 
     .case-box img {
       max-width: 100%;
       max-height: 100%;
-
       object-fit: contain;
       transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
       opacity: 85%;
     }
 
     .case-box.highlight img {
-      transform: scale(1.25) translateY(-2px);
+      transform: scale(1.15) translateY(-2px);
       opacity: 100%;
     }
 
@@ -218,8 +218,6 @@
     }
 
     @media (max-width: 700px) {
-
-
       .head1 h1 {
         font-size: 35px;
       }
@@ -230,16 +228,33 @@
         width: 80%;
       }
     }
+
+    .case-box.highlight img.common,
+    .case-box.highlight img.uncommon,
+    .case-box.highlight img.rare,
+    .case-box.highlight img.legendary,
+    .case-box.highlight img.arcane {
+      filter: drop-shadow(0 0 10px rgba(109, 115, 115, 0.3));
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    button:disabled {
+      background-color: #4b007d;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
   </style>
 </head>
-
 <body>
   <header>
-    <h1>GAMBLE-X</h1>
+    <h1 onclick="window.location.href='/'">GAMBLE-X</h1>
     <nav>
-      <a class="logout" href="#Logout">
-        <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
-      </a>
+        <a class="logout" href="#Logout">
+            <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+          </a>
       <a class="wallet" href="#Wallet">
         <span class="g-text">0</span>
         <img class="goldIco" src="gold.webp" />
@@ -253,71 +268,34 @@
     </div>
   </div>
   <button id="spinButton">Spin</button>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-    import {
-      getDatabase,
-      ref,
-      get,
-    } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDwztPRk-03SbzzXBL2oVcNhIVVyoMghRo",
-      authDomain: "x-gamble.firebaseapp.com",
-      databaseURL: "https://x-gamble-default-rtdb.firebaseio.com",
-      projectId: "x-gamble",
-      storageBucket: "x-gamble.firebasestorage.app",
-      messagingSenderId: "137859041618",
-      appId: "1:137859041618:web:b494dcc52c5175943ed28b",
-      measurementId: "G-JLWF6GZJE9",
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
+  <script>
     let itemData = [];
     const caseInnerContainer = document.getElementById("caseInnerContainer");
-
+    const spinButton = document.getElementById("spinButton");
+  
+    spinButton.disabled = true;
+  
     async function loadData() {
+  
       try {
-        const caseID = "00001";
-        const caseRef = ref(db, `cases/${caseID}`);
-        const caseSnapshot = await get(caseRef);
-
-        if (!caseSnapshot.exists()) {
-          console.error(`Case data not found for ID: ${caseID}`);
-          return;
-        }
-
-        const skinsString = caseSnapshot.val();
-        if (!skinsString) {
-          console.error(`Invalid or empty 'skins' string for case ${caseID}`);
-          return;
-        }
-
-        const skins = skinsString
-          .split(",")
-          .map((id) => id.trim())
-          .filter(Boolean);
-
-        console.log("Parsed skins array:", skins);
-
+        const caseID = new URLSearchParams(window.location.search).get('open');
+        if (!caseID) return window.location.href = "/";
+  
+        const casesData = await fetch('/cases.json').then(response => response.json());
+        const itemsData = await fetch('/items.json').then(response => response.json());
+        const skinsString = casesData[caseID];
+        if (!skinsString) return window.location.href = "/";
+  
+        const skins = skinsString.split(",").map(id => id.trim()).filter(Boolean);
+  
         const skinPromises = skins.map(async (id) => {
-          const skinRef = ref(db, `items/all/${id}`);
-          const skinSnapshot = await get(skinRef);
-
-          if (!skinSnapshot.exists()) {
-            console.warn(`Skin not found for ID: ${id}`);
-            return null;
-          }
-
-          const skinData = skinSnapshot.val();
-
+          const skinData = itemsData[id];
+          if (!skinData) return null;
+  
           const rawName = skinData.data.split("_")[1];
-          const name = rawName.replace(/-/g, " ");
-
+          const name = rawName.replace(/_/g, " ");
           const img = `https://raw.githubusercontent.com/gamblex-data/gamblex/refs/heads/main/items/${skinData.collection}/${skinData.data}.png`;
-
+  
           return {
             ...skinData,
             name,
@@ -325,138 +303,144 @@
             rarity: parseFloat(skinData.rarity) || 100,
           };
         });
-
-        const fetchedSkins = await Promise.all(skinPromises);
-
-        itemData = fetchedSkins.filter(Boolean);
-
-        if (itemData.length === 0) {
-          console.error("No valid skins found after fetching data.");
-          return;
-        }
-
+  
+        itemData = (await Promise.all(skinPromises)).filter(Boolean);
+  
+        if (itemData.length === 0) return window.location.href = "/";
+  
         setupBoxes();
+        spinButton.disabled = false;
+  
+        document.body.style.visibility = 'visible';
       } catch (error) {
-        console.error("Error loading data from Realtime Database:", error);
+        window.location.href = "/";
       }
     }
-
+  
     function setupBoxes() {
       const numBoxes = Math.floor(caseInnerContainer.offsetWidth / 102);
-      caseInnerContainer.innerHTML = Array(numBoxes)
-        .fill(`<div class="case-box"></div>`)
-        .join("");
+      caseInnerContainer.innerHTML = Array(numBoxes).fill(`<div class="case-box"></div>`).join("");
       document.querySelectorAll(".case-box")[numBoxes - 6].classList.add("red");
       assignSkins();
     }
-
+  
     function assignSkins() {
       const boxes = document.querySelectorAll(".case-box");
-
       let totalWeight = itemData.reduce((sum, item) => sum + item.rarity, 0);
-
+  
       boxes.forEach((box) => {
         const rand = Math.random() * totalWeight;
         let accumulatedWeight = 0;
-
         for (let item of itemData) {
           accumulatedWeight += item.rarity;
           if (rand <= accumulatedWeight) {
-            box.innerHTML = `<img src="${item.img}" alt="${item.name}" title="${item.name}" />`;
+            const rarityClass = getRarityClass(item.rarity);
+            box.innerHTML = `<img src="${item.img}" alt="${item.name}" title="${item.name}" class="${rarityClass}" />`;
             break;
           }
         }
       });
     }
-
-    function alignRedBox() {
-      const caseContainerElement = document.getElementById("caseContainer");
-      const caseWrapperElement = document.querySelector(".case-container-wrapper");
-      const caseBoxes = document.querySelectorAll(".case-box");
-
-
-      const redBoxIndex = Array.from(caseBoxes).findIndex((box) =>
-        box.classList.contains("red")
-      );
-
-      if (redBoxIndex === -1) {
-        console.error("No red box found!");
-        return;
-      }
-
-      const boxWidth = caseBoxes[0].offsetWidth;
-      const containerWidth = caseWrapperElement.offsetWidth;
-
-
-      const redBoxLeft = redBoxIndex * boxWidth;
-
-
-      const randomPosition = Math.random() * boxWidth + redBoxLeft;
-
-
-      const wrapperCenter = containerWidth / 2;
-      const targetTranslation = wrapperCenter - randomPosition;
-
-
-      caseContainerElement.style.transform = `translateX(${targetTranslation}px)`;
+  
+    function getRarityClass(rarity) {
+      if (rarity <= 1) return "arcane";
+      if (rarity <= 5) return "legendary";
+      if (rarity <= 10) return "rare";
+      if (rarity <= 20) return "uncommon";
+      return "common";
     }
+  
+    let randomPosition = null;
+let isSpinning = false;
+let spinTimeout = null;
+let highlightInterval = null;
 
+function alignRedBox() {
+  const caseContainerElement = document.getElementById("caseContainer");
+  const caseWrapperElement = document.querySelector(".case-container-wrapper");
+  const caseBoxes = document.querySelectorAll(".case-box");
+  const redBoxIndex = Array.from(caseBoxes).findIndex((box) => box.classList.contains("red"));
 
+  if (redBoxIndex === -1) return;
 
-    function spin() {
-      const caseContainerElement = document.getElementById("caseContainer");
+  const boxWidth = caseBoxes[0].offsetWidth;
+  const containerWidth = caseWrapperElement.offsetWidth;
+  const redBoxLeft = redBoxIndex * boxWidth;
 
+  console.log(randomPosition)  
 
-      caseContainerElement.style.transition = "none";
-      caseContainerElement.style.transform = "translateX(0)";
+  const wrapperCenter = containerWidth / 2;
+  const targetTranslation = wrapperCenter - randomPosition;
+  caseContainerElement.style.transform = `translateX(${targetTranslation}px)`;
+}
 
+function spin() {
+  if (isSpinning) {
+    clearTimeout(spinTimeout);
+    clearInterval(highlightInterval);
+    isSpinning = false;
+  }
 
-      caseContainerElement.offsetHeight;
+  highlightInterval = setInterval(highlightBoxes, 111);
 
+  isSpinning = true;
+  spinButton.disabled = true;
 
-      caseContainerElement.style.transition = "transform 12s cubic-bezier(0.08, 0.6, 0.2, 1)";
+  const caseContainerElement = document.getElementById("caseContainer");
 
+  assignSkins();
+  caseContainerElement.style.transition = "none";
+  caseContainerElement.style.transform = "translateX(0)";
+  caseContainerElement.offsetHeight;
 
-      alignRedBox();
-      setTimeout(() => {
-        caseContainerElement.style.transition = "none";
-      }, 12000);
-    }
+  caseContainerElement.style.transition = "transform 12s cubic-bezier(0.08, 0.6, 0.2, 1)";
+  alignRedBox();
 
+  spinTimeout = setTimeout(() => {
+    caseContainerElement.style.transition = "none";
+    spinButton.disabled = false;
+    isSpinning = false;
+    clearInterval(highlightInterval);
+  }, 12000);
+}
 
     window.addEventListener("resize", () => {
-      alignRedBox();
+      if (isSpinning) {
+        spin(); 
+      } else {
+        alignRedBox();
+      }
     });
-
-
-    window.onload = () => {
-      loadData();
-      setInterval(highlightBoxes, 111);
-    };
-
-
-
+  
+  
+    window.onload = loadData;
+  
     function highlightBoxes() {
       const lineLeft = document.querySelector(".case-line").getBoundingClientRect().left;
       const boxes = document.querySelectorAll(".case-box");
-
+  
       boxes.forEach((box) => {
         const boxRect = box.getBoundingClientRect();
-        const isOverlapping =
-          boxRect.left < lineLeft && boxRect.right > lineLeft;
+        const isOverlapping = boxRect.left < lineLeft && boxRect.right > lineLeft;
         box.classList.toggle("highlight", isOverlapping);
       });
     }
+  
+    spinButton.addEventListener("click", () => {
+  if (!randomPosition) {
+    
+    const caseBoxes = document.querySelectorAll(".case-box");
+    const redBoxIndex = Array.from(caseBoxes).findIndex((box) => box.classList.contains("red"));
+    const boxWidth = caseBoxes[0].offsetWidth;
+    const redBoxLeft = redBoxIndex * boxWidth;
 
-    window.spin = spin;
+    randomPosition = Math.random() * boxWidth + redBoxLeft;
+  }
 
-    window.onload = () => {
-      loadData();
-      setInterval(highlightBoxes, 111);
-    };
-
-    document.getElementById("spinButton").addEventListener("click", spin);
+  spin();
+});
   </script>
+  
 </body>
-
 </html>
+
