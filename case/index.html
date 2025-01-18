@@ -279,12 +279,12 @@
   
       try {
         const caseID = new URLSearchParams(window.location.search).get('open');
-        if (!caseID) return console.log("no caseid");
+        if (!caseID) return window.location.href = "/";
   
         const casesData = await fetch('https://raw.githubusercontent.com/gamblex-data/gamblex/refs/heads/main/cases.json').then(response => response.json());
         const itemsData = await fetch('https://raw.githubusercontent.com/gamblex-data/gamblex/refs/heads/main/items.json').then(response => response.json());
         const skinsString = casesData[caseID];
-        if (!skinsString) return console.log("no skinstring");
+        if (!skinsString) return window.location.href = "/";
   
         const skins = skinsString.split(",").map(id => id.trim()).filter(Boolean);
   
@@ -306,14 +306,14 @@
   
         itemData = (await Promise.all(skinPromises)).filter(Boolean);
   
-        if (itemData.length === 0) return console.log("no itemdata");
+        if (itemData.length === 0) return window.location.href = "/";
   
         setupBoxes();
         spinButton.disabled = false;
   
         document.body.style.visibility = 'visible';
       } catch (error) {
-        console.log(error);
+        window.location.href = "/";
       }
     }
   
