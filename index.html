@@ -204,13 +204,13 @@
           transform: translate(-50%, -50%) rotate(0deg) scale(1.1);
         }
         25% {
-          transform: translate(-50%, -50%) rotate(-3deg) scale(1.1);
+          transform: translate(-50%, -50%) rotate(-2deg) scale(1.1);
         }
         50% {
-          transform: translate(-50%, -50%) rotate(3deg) scale(1.1);
+          transform: translate(-50%, -50%) rotate(2deg) scale(1.1);
         }
         75% {
-          transform: translate(-50%, -50%) rotate(-3deg) scale(1.1);
+          transform: translate(-50%, -50%) rotate(-2deg) scale(1.1);
         }
         100% {
           transform: translate(-50%, -50%) rotate(0deg) scale(1.1);
@@ -369,93 +369,64 @@
 
       <div class="box-container cases"></div>
       <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-        import {
-          getDatabase,
-          ref,
-          get,
-        } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js";
-      
-        const firebaseConfig = {
-          apiKey: "AIzaSyDwztPRk-03SbzzXBL2oVcNhIVVyoMghRo",
-          authDomain: "x-gamble.firebaseapp.com",
-          databaseURL: "https://x-gamble-default-rtdb.firebaseio.com",
-          projectId: "x-gamble",
-          storageBucket: "x-gamble.firebasestorage.app",
-          messagingSenderId: "137859041618",
-          appId: "1:137859041618:web:b494dcc52c5175943ed28b",
-          measurementId: "G-JLWF6GZJE9",
-        };
-      
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-      
         function formatName(rawName) {
-          return rawName
-            .split("_")[1]
-            .replace(/-/g, " ") 
-            .toLowerCase() 
+          const [prefix, name] = rawName.split("_");
+          const formattedPrefix =
+            prefix.charAt(0).toUpperCase() + prefix.slice(1).toLowerCase();
+          const formattedName = name
+            .replace(/-/g, " ")
+            .toLowerCase()
             .replace(/\b\w/g, (char) => char.toUpperCase());
+          return `${formattedPrefix} ${formattedName}`;
         }
-      
+
         async function fetchCases() {
-          try {
-            
-            const casesRef = ref(db, "main/cases");
-            const casesSnapshot = await get(casesRef);
-      
-            if (!casesSnapshot.exists()) {
-              console.error("No cases found in database!");
-              return;
-            }
-      
-            const casesText = casesSnapshot.val();
-            const caseIds = casesText
-              .split(",")
-              .map((id) => id.trim())
-              .filter((id) => id);
-      
-            const casesContainer = document.querySelector(".box-container.cases");
-            casesContainer.innerHTML = "";
-      
-            for (const caseId of caseIds) {
-              const itemRef = ref(db, `items/all/${caseId}`);
-              const itemSnapshot = await get(itemRef);
-      
-              if (!itemSnapshot.exists()) {
-                console.error(`Item with ID ${caseId} not found!`);
-                continue;
-              }
-      
-              const itemData = itemSnapshot.val();
-      
-            
-              const formattedName = formatName(itemData.data);
-      
-             
-              const imageUrl = `https://raw.githubusercontent.com/gamblex-data/gamblex/refs/heads/main/items/${itemData.collection}/${itemData.data}.png`;
-      
-              
-              const caseElement = document.createElement("div");
-              caseElement.classList.add("case");
-      
-              caseElement.innerHTML = `
-                <div class="case-name">${formattedName}</div>
-                <img src="${imageUrl}" alt="${formattedName}" />
-                <div class="case-price">$${itemData.price}</div>
-              `;
-      
-              caseElement.addEventListener("click", () => {
-                window.location.href = `/case/?c=${caseId}`;
-              });
-      
-              casesContainer.appendChild(caseElement);
-            }
-          } catch (error) {
-            console.error("Error loading cases:", error);
-          }
-        }
-      
+  try {
+    const itemsResponse = await fetch("./items.json");
+    const mainResponse = await fetch("./main.json");
+    const itemsData = await itemsResponse.json();
+    const mainData = await mainResponse.json();
+
+    const casesText = mainData.cases;
+    const caseIds = casesText
+      .split(",")
+      .map((id) => id.trim())
+      .filter((id) => id);
+
+    const casesContainer = document.querySelector(".box-container.cases");
+    casesContainer.innerHTML = "";
+
+    for (const caseId of caseIds) {
+      const itemData = itemsData[caseId];
+      if (!itemData) {
+        console.error(`Item with ID ${caseId} not found!`);
+        continue;
+      }
+
+      const formattedName = formatName(itemData.data);
+
+      const imageUrl = `https://raw.githubusercontent.com/gamblex-data/gamblex/refs/heads/main/items/${itemData.collection}/${itemData.data}.png`;
+
+      const caseElement = document.createElement("div");
+      caseElement.classList.add("case");
+
+      caseElement.innerHTML = `
+        <div class="case-name">${formattedName}</div>
+        <img src="${imageUrl}" alt="${caseId}" />
+        <div class="case-price">$${itemData.price}</div>
+      `;
+
+      caseElement.addEventListener("click", () => {
+        window.location.href = `/case/?open=${caseId}`;
+      });
+
+      casesContainer.appendChild(caseElement);
+    }
+  } catch (error) {
+    console.error("Error loading cases:", error);
+  }
+}
+
         fetchCases();
       </script>
       
