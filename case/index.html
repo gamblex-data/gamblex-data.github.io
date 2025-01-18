@@ -281,8 +281,8 @@
         const caseID = new URLSearchParams(window.location.search).get('open');
         if (!caseID) return window.location.href = "/";
   
-        const casesData = await fetch('/cases.json').then(response => response.json());
-        const itemsData = await fetch('/items.json').then(response => response.json());
+        const casesData = await fetch('https://raw.githubusercontent.com/gamblex-data/gamblex/refs/heads/main/cases.json').then(response => response.json());
+        const itemsData = await fetch('https://raw.githubusercontent.com/gamblex-data/gamblex/refs/heads/main/items.json').then(response => response.json());
         const skinsString = casesData[caseID];
         if (!skinsString) return window.location.href = "/";
   
