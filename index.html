@@ -339,13 +339,73 @@
       }
     </style>
   </head>
+  <script type="module">
+  // Import the necessary Firebase modules
+  import {
+    initializeApp
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDwztPRk-03SbzzXBL2oVcNhIVVyoMghRo",
+    authDomain: "x-gamble.firebaseapp.com",
+    databaseURL: "https://x-gamble-default-rtdb.firebaseio.com",
+    projectId: "x-gamble",
+    storageBucket: "x-gamble.firebasestorage.app",
+    messagingSenderId: "137859041618",
+    appId: "1:137859041618:web:b494dcc52c5175943ed28b",
+    measurementId: "G-JLWF6GZJE9"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Function to update the header based on the user's auth state
+  function updateAuthUI(user) {
+    const authButton = document.querySelector(".auth-button");
+    if (user) {
+      // User is logged in
+      authButton.textContent = "Logout";
+      authButton.classList.add("logout");
+      authButton.classList.remove("login");
+      authButton.onclick = async () => {
+        try {
+          await signOut(auth);
+          console.log("User logged out");
+        } catch (error) {
+          console.error("Error during logout:", error.message);
+        }
+      };
+    } else {
+      // User is not logged in
+      authButton.textContent = "Login";
+      authButton.classList.add("login");
+      authButton.classList.remove("logout");
+      authButton.onclick = () => {
+        // Redirect to login page (replace with your login page URL)
+        window.location.href = "/login";
+      };
+    }
+  }
+
+  // Monitor authentication state
+  onAuthStateChanged(auth, (user) => {
+    updateAuthUI(user);
+  });
+</script>
+
   <body>
     <header>
       <h1>GAMBLE-X</h1>
       <nav>
-        <a class="logout" href="#Logout">
-          <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
-        </a>
+        <a class="auth-button login" href="#">Login</a>
         <a class="wallet" href="#Wallet">
           <span class="g-text">0</span>
           <img class="goldIco" src="gold.webp" />
@@ -382,8 +442,8 @@
 
         async function fetchCases() {
   try {
-    const itemsResponse = await fetch("https://raw.githubusercontent.com/gamblex-data/gamblex/refs/heads/main/items.json");
-    const mainResponse = await fetch("https://raw.githubusercontent.com/gamblex-data/gamblex/refs/heads/main/main.json");
+    const itemsResponse = await fetch("./items.json");
+    const mainResponse = await fetch("./main.json");
     const itemsData = await itemsResponse.json();
     const mainData = await mainResponse.json();
 
