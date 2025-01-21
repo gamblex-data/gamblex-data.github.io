@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <style>
+    body {
+      background-color: rgb(0, 6, 21);
+      color: white;
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background: #5e1c8218;
+      padding: 20px 30px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+      margin: 20px;
+    }
+
+    .return-button {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: none;
+      border: none;
+      opacity: 50%;
+      color: #7b1fa2;
+      font-size: 2.5vh;
+      cursor: pointer;
+      font-weight: bold;
+      transition: color 0.3s ease;
+      
+    }
+
+    .return-button:hover {
+      color: #541270;
+    }
+
+    .login-container h2 {
+      text-align: center;
+      margin: 0;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #ededed;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #333;
+      border-radius: 5px;
+      font-size: 16px;
+      background: #0f0f1f;
+      color: #bbb;
+      box-sizing: border-box;
+    }
+
+    .form-group input:focus {
+      border-color: #541270;
+      outline: none;
+    }
+
+    .login-button {
+      width: 100%;
+      padding: 10px;
+      background-color: #7b1fa2;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .login-button:hover {
+      background-color: #541270;
+    }
+
+    .login-container .footer {
+      text-align: center;
+      margin-top: 15px;
+      color: #bbb;
+      font-size: 14px;
+    }
+
+    .login-container .footer a {
+      color: #7b1fa2;
+      text-decoration: none;
+    }
+
+    .login-container .footer a:hover {
+      text-decoration: underline;
+    }
+
+    * {
+      -webkit-user-drag: none;
+      -khtml-user-drag: none;
+      -moz-user-drag: none;
+      -o-user-drag: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    button:disabled {
+      background-color: #4b007d;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    @media (max-width: 700px) {
+      .login-container {
+        margin-top: -250px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <button class="return-button" onclick="window.location.href='/'">↩</button>
+    <h2>Login</h2>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">Email / Username</label>
+        <input type="username" id="username" name="username" placeholder="............." required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="............." required>
+      </div>
+      <button type="submit" class="login-button">Login</button>
+    </form>
+    
+    <div class="footer">
+      <p>Don't have an account? <a href="/signup">Sign up</a></p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+  
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwztPRk-03SbzzXBL2oVcNhIVVyoMghRo",
+      authDomain: "x-gamble.firebaseapp.com",
+      databaseURL: "https://x-gamble-default-rtdb.firebaseio.com",
+      projectId: "x-gamble",
+      storageBucket: "x-gamble.appspot.com",
+      messagingSenderId: "137859041618",
+      appId: "1:137859041618:web:b494dcc52c5175943ed28b",
+      measurementId: "G-JLWF6GZJE9"
+    };
+  
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+  
+    function isEmail(input) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(input);
+    }
+  
+    async function getEmailByUsername(username) {
+      const userDoc = await getDoc(doc(db, "Xj7nZ9wVQ3kAfE2L8qz1YcKJ9Ht7mBvLQ5I7gZ4b3jT6XyVt2s7NqQjFw8pZk", username));
+      if (userDoc.exists()) {
+        return userDoc.data().email;
+      } else {
+        throw new Error("Username not found");
+      }
+    }
+  
+    async function handleLogin(event) {
+      event.preventDefault();
+  
+      const usernameInput = document.getElementById("username").value;
+      const passwordInput = document.getElementById("password").value;
+      const loginButton = document.querySelector(".login-button");
+      let email;
+  
+      try {
+        // Disable the button and add the disabled class
+        loginButton.disabled = true;
+        loginButton.classList.add("disabled");
+  
+        if (isEmail(usernameInput)) {
+          email = usernameInput;
+        } else {
+          email = await getEmailByUsername(usernameInput);
+        }
+  
+        const userCredential = await signInWithEmailAndPassword(auth, email, passwordInput);
+        const user = userCredential.user;
+  
+        sessionStorage.setItem("user", JSON.stringify(user));
+  
+        if (navigator.credentials) {
+          const credentials = new PasswordCredential({
+            id: usernameInput,
+            password: passwordInput,
+            name: user.displayName || "User"
+          });
+  
+          await navigator.credentials.store(credentials);
+        }
+  
+        window.location.href = "/";
+      } catch (error) {
+        alert("Invalid username or password.");
+        // Re-enable the button and remove the disabled class
+        loginButton.disabled = false;
+        loginButton.classList.remove("disabled");
+      }
+    }
+  
+    function checkAuthState() {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          window.location.href = "/";
+        }
+      });
+    }
+  
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.querySelector("form");
+      form.addEventListener("submit", handleLogin);
+    });
+  
+    window.onload = checkAuthState;
+  </script>
+  
+</body>
+</html>
